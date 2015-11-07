@@ -1,0 +1,35 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../expandjs/expandjs.html">
+<link rel="import" href="../tux-d3/tux-d3.html">
+<script>
+  /* @polymerBehavior Tux.d3DataBrokerBehavior */
+
+  TuxD3.DataBrokerBehaviorImpl =  {
+     coupleSourcesToConsumers: function() {
+         var self = this;
+         var defaultSource = self.querySelector('[is-data-source]');
+         var consumers = [].slice.call(self.querySelectorAll('[is-data-consumer]'));
+         XP.assert(XP.isElement(defaultSource) && XP.isArray(consumers), function() {
+             throw new Error('data brokers must have at least one source and one consumer before coupling');
+         });
+         consumers.forEach(function(consumer) {
+             var source = defaultSource;
+             if(consumer.dataSource !== '') {
+                 source = self.querySelector('[is-data-source]#' + consumer.dataSource);
+                 XP.assert(XP.isElement(source));
+             }
+             consumer.attachDataSource(source);
+         });
+     },
+
+     attached: function() {
+         var self = this;
+         self.async(function() {
+             self.coupleSourcesToConsumers();
+         });
+     }
+  };
+
+  /* @polymerBehavior */
+  TuxD3.DataBrokerBehavior = TuxD3.DataBrokerBehaviorImpl;
+</script>
